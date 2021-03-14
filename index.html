@@ -10,33 +10,62 @@
 </head>
 <body>
 
-<script src="node_modules/three/build/three.js"></script>
+<!--<script src="node_modules/three/build/three.js"></script>-->
 <!--<script src="node_modules/three/build/three.module.js"></script>-->
-<script>
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+<script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@v0.126.1/build/three.module.js';
+    // import * as THREE from './node_modules/three/build/three.module.js';
 
-        const renderer = new THREE.WebGLRenderer();
+    import { VRButton } from './jsm/webxr/VRButton.js';
+
+    let camera, scene, renderer
+
+    let cube
+
+    init()
+    animate()
+
+    function init() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.xr.enabled = true;
         document.body.appendChild(renderer.domElement);
+        document.body.appendChild(VRButton.createButton(renderer));
 
-        geometry = new THREE.BoxGeometry( 1, 1, 1 );
-        material = new THREE.MeshNormalMaterial();
+        let geometry = new THREE.BoxGeometry(1, 1, 1);
+        let material = new THREE.MeshNormalMaterial();
         cube = new THREE.Mesh(geometry, material);
+        cube.position.z -= 2
+        cube.position.y += 1
         scene.add(cube);
 
         camera.position.z = 5;
+        window.addEventListener('resize', onWindowResize, false);
+    }
 
-    const animate = function () {
-        requestAnimationFrame( animate );
+    function animate () {
+        renderer.setAnimationLoop( render );
+    }
+
+    function render() {
 
         cube.rotation.x += 0.01;
         cube.rotation.y += 0.01;
 
         renderer.render( scene, camera );
-    };
+    }
 
-    animate();
+    function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+    }
+
 </script>
 </body>
 </html>
